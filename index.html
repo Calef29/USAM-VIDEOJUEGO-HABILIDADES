@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1a0a1e">
+<title>Habilidades Perdidas · USAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--rojo:#d41c3a;--carmesi:#a3122e;--azul:#1a2363;--azul2:#2e3f9e;--crema:#f3e9ef;--oro:#f2b93b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#12081a;color:var(--crema);font-family:Inter,system-ui,sans-serif;touch-action:none}
+canvas#mundo{position:fixed;inset:0;width:100%;height:100%;display:block}
+.capa{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:20;
+ background:radial-gradient(ellipse at 50% 30%,rgba(163,18,46,.85),rgba(18,8,26,.96) 70%)}
+.oculto{display:none!important}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,11vw,96px);line-height:.9;margin:0 0 8px;letter-spacing:1px;text-shadow:4px 4px 0 var(--azul)}
+.sub{font-size:clamp(14px,3.6vw,18px);max-width:520px;opacity:.92;line-height:1.45;margin:0 0 22px}
+.btn{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;padding:14px 34px;border:0;border-radius:14px;background:var(--crema);color:var(--carmesi);
+ box-shadow:5px 5px 0 var(--azul);cursor:pointer}
+.btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--azul)}
+.btn.sec{background:transparent;color:var(--crema);border:2px solid var(--crema);box-shadow:none;font-size:22px;padding:10px 24px}
+.trio{display:flex;gap:10px;margin:0 0 20px}
+.trio img{width:72px;height:72px;border-radius:50%;border:3px solid var(--crema);background:var(--azul2);object-fit:cover}
+.creditos{position:absolute;bottom:14px;left:0;right:0;font-size:11px;opacity:.65;padding:0 16px}
+/* HUD */
+#hud{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;gap:10px;align-items:center;padding:max(10px,env(safe-area-inset-top)) 12px 10px;
+ background:linear-gradient(rgba(18,8,26,.85),rgba(18,8,26,0));pointer-events:none}
+#hud img{width:50px;height:50px;border-radius:50%;border:3px solid var(--crema);background:var(--azul2);flex:none}
+#mision{font-size:13px;line-height:1.3}
+#mision b{font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:400;letter-spacing:.5px;display:block}
+#progreso{margin-left:auto;display:flex;gap:6px;flex:none}
+#progreso span{width:14px;height:14px;border-radius:50%;border:2px solid var(--crema)}
+#progreso span.ok{background:var(--oro);border-color:var(--oro)}
+#flecha{position:fixed;top:78px;left:50%;width:46px;height:46px;margin-left:-23px;z-index:10;pointer-events:none;transition:opacity .3s}
+#flecha svg{width:100%;height:100%;filter:drop-shadow(2px 2px 0 var(--azul))}
+#dist{position:fixed;top:126px;left:0;right:0;text-align:center;font-size:12px;z-index:10;pointer-events:none;opacity:.85}
+#aviso{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);z-index:15;background:var(--crema);color:var(--carmesi);padding:12px 18px;border-radius:14px;
+ font-weight:800;font-size:15px;max-width:86vw;text-align:center;box-shadow:5px 5px 0 var(--azul);opacity:0;transition:opacity .25s;pointer-events:none}
+#aviso.ver{opacity:1}
+/* joystick */
+#zonaJoy{position:fixed;left:0;bottom:0;width:60%;height:55%;z-index:9}
+#joy{position:fixed;width:130px;height:130px;border-radius:50%;border:3px solid rgba(243,233,239,.55);background:rgba(26,35,99,.35);z-index:9;pointer-events:none;
+ left:calc(30px + env(safe-area-inset-left));bottom:calc(30px + env(safe-area-inset-bottom))}
+#perilla{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:var(--crema);box-shadow:3px 3px 0 var(--azul)}
+#ayudaJoy{position:fixed;bottom:calc(170px + env(safe-area-inset-bottom));left:30px;font-size:12px;opacity:.8;z-index:9;pointer-events:none}
+/* final */
+.tarjetas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(640px,100%);margin:0 0 16px}
+.tarjeta{background:rgba(26,35,99,.75);border:2px solid var(--crema);border-radius:14px;padding:10px 6px;text-decoration:none;color:var(--crema)}
+.tarjeta img{width:64px;height:64px;border-radius:50%;border:2px solid var(--oro);object-fit:cover}
+.tarjeta b{display:block;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:400}
+.tarjeta small{display:block;font-size:11px;opacity:.85;min-height:28px}
+.tarjeta span{display:inline-block;margin-top:6px;font-size:11px;font-weight:800;background:var(--crema);color:var(--carmesi);padding:4px 8px;border-radius:8px}
+.extras{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 0 18px}
+.extras a{color:var(--crema);border:2px solid var(--crema);border-radius:12px;padding:8px 14px;text-decoration:none;font-weight:600;font-size:14px}
+#tiempoFinal{font-family:'Bebas Neue',sans-serif;font-size:30px;margin:0 0 12px;color:var(--oro)}
+#cargando{font-size:13px;opacity:.8;margin-top:10px}
+@media (max-width:420px){.tarjeta small{font-size:10px}}
+</style>
+</head>
+<body>
+<canvas id="mundo"></canvas>
+
+<div id="hud" class="oculto">
+  <img id="hudCara" src="assets/cara_leo.png" alt="">
+  <div id="mision"><b id="hudTitulo">Leo</b><span id="hudTexto">Atrapa su habilidad</span></div>
+  <div id="progreso"><span></span><span></span><span></span></div>
+</div>
+<div id="flecha" class="oculto"><svg viewBox="0 0 48 48"><path d="M24 4 L42 40 L24 31 L6 40 Z" fill="#f3e9ef" stroke="#1a2363" stroke-width="3" stroke-linejoin="round"/></svg></div>
+<div id="dist" class="oculto"></div>
+<div id="aviso"></div>
+<div id="zonaJoy" class="oculto"></div>
+<div id="joy" class="oculto"><div id="perilla"></div></div>
+<div id="ayudaJoy" class="oculto">Empuja hasta el borde para correr</div>
+
+<div id="inicio" class="capa">
+  <div class="trio"><img src="assets/cara_leo.png" alt="Leo"><img src="assets/cara_abi.png" alt="Abi"><img src="assets/cara_fabi.png" alt="Fabi"></div>
+  <h1>HABILIDADES<br>PERDIDAS</h1>
+  <p class="sub">Leo, Abi y Fabi necesitan encontrar sus habilidades en la USAM. Ayúdalos a encontrarlas: cada quien solo puede atrapar <b>la suya</b>.</p>
+  <button class="btn" id="btnEmpezar" disabled>CARGANDO…</button>
+  <div id="cargando"></div>
+  <div class="creditos">Arte dirigido por Leo, Abi y Fabi · Escenarios y personajes generados con IA · Mundo modelado en Blender · Haz algo bueno con la IA</div>
+</div>
+
+<div id="intro" class="capa oculto">
+  <div class="trio"><img id="introCara" src="assets/cara_leo.png" alt=""></div>
+  <h1 id="introTitulo">LEO</h1>
+  <p class="sub" id="introTexto"></p>
+  <button class="btn" id="btnIr">¡VAMOS!</button>
+</div>
+
+<div id="final" class="capa oculto">
+  <h1>¡MISIÓN<br>CUMPLIDA!</h1>
+  <div id="tiempoFinal"></div>
+  <p class="sub">Ya sabes en qué es bueno cada quien. Conoce su trabajo:</p>
+  <div class="tarjetas">
+    <a class="tarjeta" id="linkLeo" target="_blank" rel="noopener"><img src="assets/cara_leo.png" alt=""><b>Leo</b><small>Diseño gráfico y 3D</small><span>Ver portafolio</span></a>
+    <a class="tarjeta" id="linkAbi" target="_blank" rel="noopener"><img src="assets/cara_abi.png" alt=""><b>Abi</b><small>Publicidad</small><span>Ver portafolio</span></a>
+    <a class="tarjeta" id="linkFabi" target="_blank" rel="noopener"><img src="assets/cara_fabi.png" alt=""><b>Fabi</b><small>Edición de video</small><span>Ver portafolio</span></a>
+  </div>
+  <div class="extras"><a id="linkPodcast" target="_blank" rel="noopener">Escuchar el podcast</a><a id="linkCorto" target="_blank" rel="noopener">Ver «Mujeres creadoras»</a></div>
+  <button class="btn sec" id="btnOtraVez">Jugar otra vez</button>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"./lib/three/build/three.module.min.js","three/addons/":"./lib/three/examples/jsm/"}}
+</script>
+<script type="module" src="juego.js"></script>
+</body>
+</html>
